@@ -5,6 +5,10 @@ import {DataTypes} from "./lib/DataTypes.sol";
 import {Errors} from "./lib/Errors.sol";
 
 contract DRS {
+    // ========================================================
+    // STORAGE
+    // ========================================================
+
     uint8 constant MIN_UINT = 0;
     uint8 constant MAX_UINT = 100;
 
@@ -12,7 +16,10 @@ contract DRS {
     mapping(address => DataTypes.Record) public rating;
     mapping(address => mapping(bytes32 => bool)) hashRated;
 
-    //-- EVENTS--
+    // ========================================================
+    // EVENTS
+    // ========================================================
+
     event NewRegistration(address indexed _address);
     event NewRating(
         address indexed _to,
@@ -21,9 +28,24 @@ contract DRS {
         uint8 _score
     );
 
-    // --LIBRARY--
+    // ========================================================
+    // UTILS METHODS
+    // ========================================================
 
-    // --MAIN METHODS--
+    /// @notice calculate the updated rating average for user
+    function setRating(
+        uint16 _oldRating,
+        uint16 _count,
+        uint16 _score
+    ) internal pure returns (uint8) {
+        // (old value* number of ratings) + new rating / total rate +1
+        uint16 newRating = ((_oldRating * _count) + _score) / (_count + 1);
+        return uint8(newRating);
+    }
+
+    // ========================================================
+    // MAIN METHODS
+    // ========================================================
 
     /// @notice assign a DRS domain to the address
     function register() external {
@@ -73,18 +95,5 @@ contract DRS {
         rating[_to] = record;
 
         emit NewRating(msg.sender, _to, _txHash, _score);
-    }
-
-    // HELPERS
-
-    /// @notice calculate the updated rating average for user
-    function setRating(
-        uint16 _oldRating,
-        uint16 _count,
-        uint16 _score
-    ) internal pure returns (uint8) {
-        // (old value* number of ratings) + new rating / total rate +1
-        uint16 newRating = ((_oldRating * _count) + _score) / (_count + 1);
-        return uint8(newRating);
     }
 }
