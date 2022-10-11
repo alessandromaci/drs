@@ -1,2 +1,2 @@
-# drs
+# DRS
 Decentralized Rating System
