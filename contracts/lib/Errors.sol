@@ -7,5 +7,7 @@ library Errors {
     error AlreadyRegistered();
     error NotAllowedToRateYourself();
     error TxHashAlreadyRated(bytes32 _txHash);
+    error ENSAlreadyRated();
+    error ENSDomainNotFound();
     error RateOutOfRange();
 }
