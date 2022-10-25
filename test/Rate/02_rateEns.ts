@@ -49,11 +49,30 @@ describe("Rate ENS", async () => {
     expect((await contract.rating(receiver)).score).to.equal(50);
   });
 
+  it("User can't rate twice", async () => {
+    const receiver: string = "0x7bAc7a7f036e944Cc7fa04090FBb125253B63784";
+
+    const newRateTx = contract.rate(receiver, 75);
+    await expect(newRateTx).to.be.revertedWithCustomError(
+      contract,
+      "ENSAlreadyRated"
+    );
+  });
+
   it("User can't rate if the rated user is not registered", async () => {
     const rateTx = contract.rate(addressNotRegistered, 50);
     await expect(rateTx).to.be.revertedWithCustomError(
       contract,
       "UserNotRegistered"
+    );
+  });
+
+  it("User can't rate someone that doesn't have an ENS domain", async () => {
+    await contract.registerNew(addressNotRegistered);
+    const rateTx = contract.rate(addressNotRegistered, 50);
+    await expect(rateTx).to.be.revertedWithCustomError(
+      contract,
+      "ENSDomainNotFound"
     );
   });
 
