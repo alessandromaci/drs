@@ -14,17 +14,20 @@ contract RateENS {
 
     address private drs;
     address private ens;
+
     uint8 constant MIN_UINT = 0;
     uint8 constant MAX_UINT = 100;
+    bytes32 private constant ADDRESS_REVERSE_NODE =
+        0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
     mapping(address => DataTypes.Record) public rating;
-    mapping(address => mapping(address => bool)) ensRated;
+    mapping(address => mapping(address => bool)) public ensRated;
 
     // ========================================================
     // EVENTS
     // ========================================================
 
-    event NewRating(address indexed _to, address _from, uint8 _score);
+    event NewRating(address _from, address indexed _to, uint8 _score);
 
     // ========================================================
     // UTILS METHODS
@@ -50,7 +53,7 @@ contract RateENS {
     function setNode(address addr) private pure returns (bytes32) {
         return
             keccak256(
-                abi.encodePacked(ADDR_REVERSE_NODE, sha3HexAddress(addr))
+                abi.encodePacked(ADDRESS_REVERSE_NODE, sha3HexAddress(addr))
             );
     }
 
@@ -75,6 +78,7 @@ contract RateENS {
     }
 
     /// @notice check if the address has an ENS domain associated
+    /// @notice this function only tells if a record was ever set with this address. A more robust check will be done via subgraph
     function hasENS(address _address) public view returns (bool) {
         bytes32 node = setNode(_address);
         return ENS(ens).recordExists(node);
@@ -125,6 +129,6 @@ contract RateENS {
         record.score = newRating;
         rating[_to] = record;
 
-        emit NewRating(_to, msg.sender, _score);
+        emit NewRating(msg.sender, _to, _score);
     }
 }

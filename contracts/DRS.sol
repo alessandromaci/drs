@@ -9,7 +9,6 @@ contract DRS {
     // ========================================================
 
     mapping(address => bool) public registered;
-    uint public count;
 
     // ========================================================
     // EVENTS

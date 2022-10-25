@@ -15,15 +15,15 @@ contract RateHash {
     uint8 constant MAX_UINT = 100;
 
     mapping(address => DataTypes.Record) public rating;
-    mapping(address => mapping(bytes32 => bool)) hashRated;
+    mapping(address => mapping(bytes32 => bool)) public hashRated;
 
     // ========================================================
     // EVENTS
     // ========================================================
 
     event NewRating(
-        address indexed _to,
         address _from,
+        address indexed _to,
         bytes32 _txhash,
         uint8 _score
     );
