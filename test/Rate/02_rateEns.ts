@@ -2,6 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { before } from "mocha";
+require("dotenv").config();
 
 describe("Rate ENS", async () => {
   let accounts: SignerWithAddress[];
@@ -37,15 +38,15 @@ describe("Rate ENS", async () => {
 
   it("User can rate and the rating is recorded", async () => {
     await contract.registerNew(sender);
-    const signer = contract.provider.getSigner(
-      "0x7bAc7a7f036e944Cc7fa04090FBb125253B63784"
-    );
-    const rateTx = contract.connect(signer).rate(address, 50);
+    const receiver: string = "0x7bAc7a7f036e944Cc7fa04090FBb125253B63784";
+    await contract.registerNew(receiver);
+
+    const rateTx = await contract.rate(receiver, 50);
     await expect(rateTx)
       .to.emit(contract, "NewRating")
-      .withArgs(sender, address, 50);
-    expect(await contract.hashRated(sender, txHash)).to.equal(true);
-    expect((await contract.rating(address)).score).to.equal(50);
+      .withArgs(sender, receiver, 50);
+    expect(await contract.ensRated(sender, receiver)).to.equal(true);
+    expect((await contract.rating(receiver)).score).to.equal(50);
   });
 
   it("User can't rate if the rated user is not registered", async () => {
