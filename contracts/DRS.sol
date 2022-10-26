@@ -20,10 +20,6 @@ contract DRS {
     // MAIN METHODS
     // ========================================================
 
-    function getRegistered(address _address) external view returns (bool) {
-        return (registered[_address]);
-    }
-
     /// @notice assign a DRS domain to the address
     function register(address _address) external {
         if (registered[_address]) {

@@ -17,6 +17,6 @@ describe("Register", async () => {
     await expect(registerTx)
       .to.emit(contract, "NewRegistration")
       .withArgs(address);
-    expect(await contract.getRegistered(address)).to.equal(true);
+    expect(await contract.registered(address)).to.equal(true);
   });
 });

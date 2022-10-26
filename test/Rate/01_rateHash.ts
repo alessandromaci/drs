@@ -28,7 +28,7 @@ describe("Rate Hash", async () => {
   it("User should be registered and recorded in the DRS contract", async () => {
     const registerTx = contract.registerNew(address);
     await expect(registerTx).to.emit(drs, "NewRegistration").withArgs(address);
-    expect(await drs.getRegistered(address)).to.equal(true);
+    expect(await drs.registered(address)).to.equal(true);
   });
 
   it("User can rate and the rating is recorded", async () => {

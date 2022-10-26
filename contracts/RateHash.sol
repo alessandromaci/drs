@@ -61,9 +61,9 @@ contract RateHash {
         bytes32 _txHash,
         uint8 _score
     ) external {
-        if (!IDRS(drs).getRegistered(msg.sender)) {
+        if (!IDRS(drs).registered(msg.sender)) {
             revert Errors.UserNotRegistered(msg.sender);
-        } else if (!IDRS(drs).getRegistered(_to)) {
+        } else if (!IDRS(drs).registered(_to)) {
             revert Errors.UserNotRegistered(_to);
         }
 
