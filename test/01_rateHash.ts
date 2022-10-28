@@ -21,7 +21,7 @@ describe("Rate Hash", async () => {
       "0x0d2c4fb86f67d31af9b467e8562c51f86a6ea0e20fdded0d175d48da1c5117d4";
     drs = await (await ethers.getContractFactory("DRS")).deploy();
     contract = (await ethers.getContractFactory("RateHash")).attach(
-      drs.hashContract()
+      await drs.hashContract()
     );
   });
 

@@ -25,7 +25,7 @@ describe("Rate ENS", async () => {
     drs = await (await ethers.getContractFactory("DRS")).deploy();
 
     contract = (await ethers.getContractFactory("RateENS")).attach(
-      drs.ensContract()
+      await drs.ensContract()
     );
   });
 
@@ -45,7 +45,7 @@ describe("Rate ENS", async () => {
       .to.emit(contract, "NewRating")
       .withArgs(sender, receiver, 50);
     expect(await drs.ensRated(sender, receiver)).to.be.true;
-    expect((await drs.rating(receiver)).score).to.equal(50);
+    expect((await drs.ensRating(receiver)).score).to.equal(50);
   });
 
   it("User can't rate twice", async () => {
