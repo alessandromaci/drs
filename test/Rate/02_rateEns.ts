@@ -23,17 +23,16 @@ describe("Rate ENS", async () => {
     txHash =
       "0x0d2c4fb86f67d31af9b467e8562c51f86a6ea0e20fdded0d175d48da1c5117d4";
     drs = await (await ethers.getContractFactory("DRS")).deploy();
-    ensContract = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"; //ENS Mainnet;
 
-    contract = await (
-      await ethers.getContractFactory("RateENS")
-    ).deploy(drs.address, ensContract);
+    contract = (await ethers.getContractFactory("RateENS")).attach(
+      drs.ensContract()
+    );
   });
 
   it("User should be registered and recorded in the DRS contract", async () => {
     const registerTx = contract.registerNew(address);
     await expect(registerTx).to.emit(drs, "NewRegistration").withArgs(address);
-    expect(await drs.registered(address)).to.equal(true);
+    expect(await drs.registered(address)).to.be.true;
   });
 
   it("User can rate and the rating is recorded", async () => {
@@ -45,8 +44,8 @@ describe("Rate ENS", async () => {
     await expect(rateTx)
       .to.emit(contract, "NewRating")
       .withArgs(sender, receiver, 50);
-    expect(await contract.ensRated(sender, receiver)).to.equal(true);
-    expect((await contract.rating(receiver)).score).to.equal(50);
+    expect(await drs.ensRated(sender, receiver)).to.be.true;
+    expect((await drs.rating(receiver)).score).to.equal(50);
   });
 
   it("User can't rate twice", async () => {

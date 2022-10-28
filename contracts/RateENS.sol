@@ -20,9 +20,6 @@ contract RateENS {
     bytes32 private constant ADDRESS_REVERSE_NODE =
         0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
-    mapping(address => DataTypes.Record) public rating;
-    mapping(address => mapping(address => bool)) public ensRated;
-
     // ========================================================
     // EVENTS
     // ========================================================
@@ -95,7 +92,9 @@ contract RateENS {
     function rate(address _to, uint8 _score) external {
         if (!IDRS(drs).registered(msg.sender)) {
             revert Errors.UserNotRegistered(msg.sender);
-        } else if (!IDRS(drs).registered(_to)) {
+        }
+
+        if (!IDRS(drs).registered(_to)) {
             revert Errors.UserNotRegistered(_to);
         }
 
@@ -112,21 +111,19 @@ contract RateENS {
             revert Errors.ENSDomainNotFound();
         }
 
-        if (ensRated[msg.sender][_to]) {
+        if (IDRS(drs).ensRated(msg.sender, _to)) {
             revert Errors.ENSAlreadyRated();
         }
 
-        ensRated[msg.sender][_to] = true;
+        IDRS(drs).setEnsRated(msg.sender, _to, true);
 
-        uint8 oldRating = rating[_to].score;
-        uint16 count = rating[_to].count;
+        (uint16 count, uint8 oldRating) = IDRS(drs).ensRating(_to);
         uint8 newRating = setRating(oldRating, count, _score);
 
         DataTypes.Record memory record;
-
         record.count = count + 1;
         record.score = newRating;
-        rating[_to] = record;
+        IDRS(drs).setEnsRating(_to, record);
 
         emit NewRating(msg.sender, _to, _score);
     }

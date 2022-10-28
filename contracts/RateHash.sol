@@ -60,7 +60,9 @@ contract RateHash {
     ) external {
         if (!IDRS(drs).registered(msg.sender)) {
             revert Errors.UserNotRegistered(msg.sender);
-        } else if (!IDRS(drs).registered(_to)) {
+        }
+
+        if (!IDRS(drs).registered(_to)) {
             revert Errors.UserNotRegistered(_to);
         }
 

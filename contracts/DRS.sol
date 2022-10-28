@@ -14,8 +14,12 @@ contract DRS is IDRS, AccessControl {
     // ========================================================
 
     mapping(address => bool) public registered;
+
     mapping(address => DataTypes.Record) public hashRating;
     mapping(address => mapping(bytes32 => bool)) public hashRated;
+
+    mapping(address => DataTypes.Record) public ensRating;
+    mapping(address => mapping(address => bool)) public ensRated;
 
     address public ensContract;
     address public hashContract;
@@ -49,6 +53,21 @@ contract DRS is IDRS, AccessControl {
         bool _bool
     ) external onlyRole(CHILD_CONTRACT) {
         hashRated[_address][_txHash] = _bool;
+    }
+
+    function setEnsRating(address _address, DataTypes.Record calldata record)
+        external
+        onlyRole(CHILD_CONTRACT)
+    {
+        ensRating[_address] = record;
+    }
+
+    function setEnsRated(
+        address _from,
+        address _to,
+        bool _bool
+    ) external onlyRole(CHILD_CONTRACT) {
+        ensRated[_from][_to] = _bool;
     }
 
     // ========================================================

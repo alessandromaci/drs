@@ -17,12 +17,29 @@ interface IDRS {
         external
         returns (bool _rated);
 
+    function ensRating(address _address)
+        external
+        returns (uint16 _count, uint8 _score);
+
+    function ensRated(address _from, address _to)
+        external
+        returns (bool _rated);
+
     function setHashRating(address _address, DataTypes.Record calldata record)
         external;
 
     function setHashRated(
         address _address,
         bytes32 _txHash,
+        bool _bool
+    ) external;
+
+    function setEnsRating(address _address, DataTypes.Record calldata record)
+        external;
+
+    function setEnsRated(
+        address _from,
+        address _to,
         bool _bool
     ) external;
 }
