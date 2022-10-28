@@ -2,8 +2,8 @@
 pragma solidity 0.8.17;
 
 import "./interface/IDRS.sol";
-import {DataTypes} from "./lib/DataTypes.sol";
 import {Errors} from "./lib/Errors.sol";
+import {DataTypes} from "./lib/DataTypes.sol";
 
 contract RateHash {
     // ========================================================
@@ -13,9 +13,6 @@ contract RateHash {
     address public drs;
     uint8 constant MIN_UINT = 0;
     uint8 constant MAX_UINT = 100;
-
-    mapping(address => DataTypes.Record) public rating;
-    mapping(address => mapping(bytes32 => bool)) public hashRated;
 
     // ========================================================
     // EVENTS
@@ -51,7 +48,7 @@ contract RateHash {
     // MAIN METHODS
     // ========================================================
 
-    function registerNew(address _address) external {
+    function registerNew(address _address) public {
         IDRS(drs).register(_address);
     }
 
@@ -75,21 +72,19 @@ contract RateHash {
             revert Errors.RateOutOfRange();
         }
 
-        if (hashRated[msg.sender][_txHash]) {
+        if (IDRS(drs).hashRated(msg.sender, _txHash)) {
             revert Errors.TxHashAlreadyRated(_txHash);
         }
 
-        hashRated[msg.sender][_txHash] = true;
+        IDRS(drs).setHashRated(msg.sender, _txHash, true);
 
-        uint8 oldRating = rating[_to].score;
-        uint16 count = rating[_to].count;
+        (uint16 count, uint8 oldRating) = IDRS(drs).hashRating(_to);
         uint8 newRating = setRating(oldRating, count, _score);
 
         DataTypes.Record memory record;
-
         record.count = count + 1;
         record.score = newRating;
-        rating[_to] = record;
+        IDRS(drs).setHashRating(_to, record);
 
         emit NewRating(msg.sender, _to, _txHash, _score);
     }

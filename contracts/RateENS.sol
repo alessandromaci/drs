@@ -13,7 +13,7 @@ contract RateENS {
     // ========================================================
 
     address private drs;
-    address private ens;
+    address private constant ens = 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e;
 
     uint8 constant MIN_UINT = 0;
     uint8 constant MAX_UINT = 100;
@@ -33,9 +33,8 @@ contract RateENS {
     // UTILS METHODS
     // ========================================================
 
-    constructor(address _drs, address _ens) {
+    constructor(address _drs) {
         drs = _drs;
-        ens = _ens;
     }
 
     /// @notice calculate the updated rating average for user
