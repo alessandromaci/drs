@@ -19,9 +19,36 @@ import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/nextjs-material-dashboard/views/dashboardStyle.js";
 
+import { getProfile } from "../../variables/wallet";
+
+//
+const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(alchemyKey);
+
+//abi
+import DRS from "../../hardhat/deployments/goerli/DRS.json";
+
 function Dashboard() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+
+  const registerDomain = async () => {
+    let account = getProfile();
+    const drsInstance = new web3.eth.Contract(DRS.abi, DRS.address);
+
+    const registerDomainTransactionParams = {
+      from: account,
+      to: DRS.address,
+      data: drsInstance.methods.register(account).encodeABI(),
+    };
+
+    try {
+      await web3.eth.sendTransaction(registerDomainTransactionParams);
+    } catch (err) {
+      console.log("err: ", err);
+    }
+  };
   return (
     <div>
       <GridContainer>
@@ -36,8 +63,7 @@ function Dashboard() {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Update />
-                Just Updated
+                <button onClick={registerDomain}>Show</button>
               </div>
             </CardFooter>
           </Card>
