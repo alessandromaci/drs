@@ -20,6 +20,7 @@ import logo from "assets/img/reactlogo.png";
 //wallet connect
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
+import { setProfile } from "../variables/wallet";
 
 let ps;
 
@@ -44,6 +45,7 @@ export default function Admin({ children, ...rest }) {
     const checkForEns = await lookupEnsAddress(address);
     checkForEns !== null ? setAccount(checkForEns) : setAccount(address);
     setWalletConnected(true);
+    setProfile(address);
 
     const network = await web3Provider.getNetwork();
     if (network.chainId !== 5) {
