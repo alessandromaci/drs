@@ -9,7 +9,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Navbar from "components/Navbars/Navbar.js";
 import Footer from "components/Footer/Footer.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
-import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
 
 import routes from "routes.js";
 
@@ -18,9 +17,68 @@ import styles from "assets/jss/nextjs-material-dashboard/layouts/adminStyle.js";
 import bgImage from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 
+//wallet connect
+import Web3Modal from "web3modal";
+import { ethers } from "ethers";
+
 let ps;
 
 export default function Admin({ children, ...rest }) {
+  // wallet connect
+  const [walletConnected, setWalletConnected] = React.useState(false);
+  const [account, setAccount] = React.useState();
+  const [networkError, setNetworkError] = React.useState();
+
+  const lookupEnsAddress = async (walletAddress) => {
+    const provider = await web3Modal.connect();
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const checkForEnsDomain = await web3Provider.lookupAddress(walletAddress);
+    return checkForEnsDomain;
+  };
+
+  const connectWallet = async () => {
+    const provider = await web3Modal.connect();
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const signer = web3Provider.getSigner();
+    const address = await signer.getAddress();
+    const checkForEns = await lookupEnsAddress(address);
+    checkForEns !== null ? setAccount(checkForEns) : setAccount(address);
+    setWalletConnected(true);
+
+    const network = await web3Provider.getNetwork();
+    if (network.chainId !== 5) {
+      setNetworkError(true);
+    }
+  };
+
+  // // UseEffects
+
+  React.useEffect(() => {
+    if (web3Modal.cachedProvider) {
+      connectWallet();
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
+      window.ethereum.on("accountsChanged", () => {
+        window.location.reload();
+      });
+    }
+  });
+
+  let web3Modal;
+  if (typeof window !== "undefined") {
+    web3Modal = new Web3Modal({
+      network: "goerli",
+      cacheProvider: true,
+      providerOptions: {},
+    });
+  }
+
   // used for checking current route
   const router = useRouter();
   // styles
@@ -88,11 +146,22 @@ export default function Admin({ children, ...rest }) {
         {...rest}
       />
       <div className={classes.mainPanel} ref={mainPanel}>
-        <Navbar
+        {!walletConnected ? (
+          <div>
+            <button handleClick={connectWallet}>"Connect Wallet"</button>
+          </div>
+        ) : (
+          <div>
+            <div>
+              <p>{account}</p>
+            </div>
+          </div>
+        )}
+        {/* <Navbar
           routes={routes}
           handleDrawerToggle={handleDrawerToggle}
           {...rest}
-        />
+        /> */}
         {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
         {getRoute() ? (
           <div className={classes.content}>
