@@ -3,8 +3,11 @@ import React from "react";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 // @material-ui/icons
-import Update from "@material-ui/icons/Update";
 import Accessibility from "@material-ui/icons/Accessibility";
+import { Button } from "@material-ui/core";
+import { Box } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import Rating from "@material-ui/lab/Rating";
 // layout for this page
 import Admin from "layouts/Admin.js";
 // core components
@@ -26,25 +29,55 @@ const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    "& > * + *": {
+      marginTop: theme.spacing(1),
+    },
+  },
+}));
+
 //abi
-import DRS from "../../hardhat/deployments/goerli/DRS.json";
+import RateENS from "../../hardhat/deployments/goerli/RateENS.json";
 
 function Dashboard() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+  const ensAddress = "0xfe5deb7db9f5158f5ad3a2eb7354c10e3b45b0f4";
+  const [value, setValue] = React.useState(2);
+  const [inputAddress, setInputAddress] = React.useState("");
 
   const registerDomain = async () => {
     let account = getProfile();
-    const drsInstance = new web3.eth.Contract(DRS.abi, DRS.address);
+    const rateEnsInstance = new web3.eth.Contract(RateENS.abi, ensAddress);
 
     const registerDomainTransactionParams = {
       from: account,
-      to: DRS.address,
-      data: drsInstance.methods.register(account).encodeABI(),
+      to: ensAddress,
+      data: rateEnsInstance.methods.registerNew(account).encodeABI(),
     };
 
     try {
       await web3.eth.sendTransaction(registerDomainTransactionParams);
+    } catch (err) {
+      console.log("err: ", err);
+    }
+  };
+
+  const rateENS = async () => {
+    let account = getProfile();
+    const rateEnsInstance = new web3.eth.Contract(RateENS.abi, ensAddress);
+
+    const rateTransactionParams = {
+      from: account,
+      to: ensAddress,
+      data: rateEnsInstance.methods.rate(inputAddress, value).encodeABI(),
+    };
+
+    try {
+      await web3.eth.sendTransaction(rateTransactionParams);
     } catch (err) {
       console.log("err: ", err);
     }
@@ -63,7 +96,56 @@ function Dashboard() {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <button onClick={registerDomain}>Show</button>
+                <Button onClick={registerDomain} variant="outlined">
+                  Register Here
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p className={classes.cardCategory}>ENS Address</p>
+              <Box
+                component="form"
+                sx={{
+                  "& > :not(style)": { m: 1, width: "25ch" },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="standard-basic"
+                  label="0x7a..."
+                  variant="standard"
+                  value={inputAddress}
+                  onChange={(event, newValue) => {
+                    setInputAddress(newValue);
+                  }}
+                />
+              </Box>
+              <div className={classes.root}>
+                <Rating
+                  name="half-rating"
+                  defaultValue={2}
+                  precision={0.5}
+                  value={value}
+                  onChange={(event, newValue) => {
+                    setValue(newValue);
+                    console.log(newValue);
+                  }}
+                />
+              </div>
+            </CardHeader>
+            <CardFooter stats>
+              <div className={classes.stats}>
+                <Button onClick={rateENS} variant="outlined">
+                  Rate
+                </Button>
               </div>
             </CardFooter>
           </Card>
