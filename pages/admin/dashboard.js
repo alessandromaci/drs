@@ -41,13 +41,18 @@ const useStyles = makeStyles((theme) => ({
 
 //abi
 import RateENS from "../../hardhat/deployments/goerli/RateENS.json";
+import DRS from "../../hardhat/deployments/goerli/DRS.json";
 
 function Dashboard() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
   const ensAddress = "0xfe5deb7db9f5158f5ad3a2eb7354c10e3b45b0f4";
+  const drsAddress = "0x7383B894719d73b139d22603C2aFfFCa34a53a76";
   const [value, setValue] = React.useState(2);
+  const [rating, setRating] = React.useState(null);
   const [inputAddress, setInputAddress] = React.useState("");
+  const [searchAddress, setSearchAddress] = React.useState("");
+  const [showResult, setShowResult] = React.useState(false);
 
   const registerDomain = async () => {
     let account = getProfile();
@@ -73,7 +78,9 @@ function Dashboard() {
     const rateTransactionParams = {
       from: account,
       to: ensAddress,
-      data: rateEnsInstance.methods.rate(inputAddress, value).encodeABI(),
+      data: rateEnsInstance.methods
+        .rate(String(inputAddress), value)
+        .encodeABI(),
     };
 
     try {
@@ -82,6 +89,21 @@ function Dashboard() {
       console.log("err: ", err);
     }
   };
+
+  const getENSRating = async () => {
+    const drsInstance = new web3.eth.Contract(DRS.abi, drsAddress);
+    try {
+      const rating = await drsInstance.methods.ensRating(searchAddress).call();
+      if (rating) {
+        setRating(rating);
+        setShowResult(true);
+      }
+      console.log(rating.score);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <div>
       <GridContainer>
@@ -92,7 +114,6 @@ function Dashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Domains</p>
-              <h3 className={classes.cardTitle}>35</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -103,6 +124,7 @@ function Dashboard() {
             </CardFooter>
           </Card>
         </GridItem>
+
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="info" stats icon>
@@ -110,33 +132,23 @@ function Dashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>ENS Address</p>
-              <Box
-                component="form"
-                sx={{
-                  "& > :not(style)": { m: 1, width: "25ch" },
+              <TextField
+                id="standard-basic"
+                variant="standard"
+                value={inputAddress}
+                onChange={(event) => {
+                  setInputAddress(event.target.value);
                 }}
-                noValidate
-                autoComplete="off"
-              >
-                <TextField
-                  id="standard-basic"
-                  label="0x7a..."
-                  variant="standard"
-                  value={inputAddress}
-                  onChange={(event, newValue) => {
-                    setInputAddress(newValue);
-                  }}
-                />
-              </Box>
+              />
               <div className={classes.root}>
                 <Rating
                   name="half-rating"
                   defaultValue={2}
                   precision={0.5}
                   value={value}
-                  onChange={(event, newValue) => {
-                    setValue(newValue);
-                    console.log(newValue);
+                  onChange={(event) => {
+                    let updatedValue = event.target.value * 20;
+                    setValue(updatedValue);
                   }}
                 />
               </div>
@@ -150,43 +162,35 @@ function Dashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-      </GridContainer>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
-          <Card>
-            <CardHeader color="info">
-              <h4 className={classes.cardTitleWhite}>Last Ratings</h4>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["Timestamp", "Address", "TxHash", "Rate"]}
-                tableData={[
-                  ["1", "Dakota Rice", "$36,738", "Niger"],
-                  ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                ]}
-              />
-            </CardBody>
-          </Card>
-        </GridItem>
 
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="warning">
-              <h4 className={classes.cardTitleWhite}>Ranking Stats</h4>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Salary", "Country"]}
-                tableData={[
-                  ["1", "Dakota Rice", "$36,738", "Niger"],
-                  ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                  ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                  ["4", "Philip Chaney", "$38,735", "Korea, South"],
-                ]}
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Accessibility />
+              </CardIcon>
+              <p className={classes.cardCategory}>ENS Address</p>
+              <TextField
+                id="standard-basic"
+                variant="standard"
+                value={searchAddress}
+                onChange={(event) => {
+                  setSearchAddress(event.target.value);
+                }}
               />
-            </CardBody>
+            </CardHeader>
+            <CardFooter stats>
+              <div className={classes.stats}>
+                <Button onClick={getENSRating} variant="outlined">
+                  Search
+                </Button>
+              </div>
+              {showResult ? (
+                <div>{`You have ${rating.count} records and your score is ${rating.score}`}</div>
+              ) : (
+                <div></div>
+              )}
+            </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>
