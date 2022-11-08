@@ -22,6 +22,9 @@ import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/nextjs-material-dashboard/views/dashboardStyle.js";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { getProfile } from "../../variables/wallet";
 
 //
@@ -67,6 +70,7 @@ function Dashboard() {
 
     try {
       await web3.eth.sendTransaction(registerDomainTransactionParams);
+      toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
     }
@@ -86,6 +90,7 @@ function Dashboard() {
 
     try {
       await web3.eth.sendTransaction(rateTransactionParams);
+      toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
     }
@@ -199,13 +204,14 @@ function Dashboard() {
                 </Button>
               </div>
               {showResult ? (
-                <div>{`You have ${rating.count} records and your score is ${rating.score}`}</div>
+                <div>{`You have ${rating.count} record/s and your score is ${rating.score}/100`}</div>
               ) : (
                 <div></div>
               )}
             </CardFooter>
           </Card>
         </GridItem>
+        <ToastContainer />
       </GridContainer>
     </div>
   );

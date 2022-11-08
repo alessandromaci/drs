@@ -13,12 +13,13 @@ import Admin from "layouts/Admin.js";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
-import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import styles from "assets/jss/nextjs-material-dashboard/views/dashboardStyle.js";
 
@@ -66,6 +67,7 @@ function Dashboard() {
 
     try {
       await web3.eth.sendTransaction(registerDomainTransactionParams);
+      toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
     }
@@ -85,6 +87,7 @@ function Dashboard() {
 
     try {
       await web3.eth.sendTransaction(rateTransactionParams);
+      toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
     }
@@ -186,13 +189,14 @@ function Dashboard() {
                 </Button>
               </div>
               {showResult ? (
-                <div>{`You have ${rating.count} records and your score is ${rating.score}`}</div>
+                <div>{`You have ${rating.count} record/s and your score is ${rating.score}/100`}</div>
               ) : (
                 <div></div>
               )}
             </CardFooter>
           </Card>
         </GridItem>
+        <ToastContainer />
       </GridContainer>
     </div>
   );

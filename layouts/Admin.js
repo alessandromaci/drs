@@ -155,7 +155,7 @@ export default function Admin({ children, ...rest }) {
         ) : (
           <div>
             <div>
-              <p>{account}</p>
+              <p>Address: {account}</p>
             </div>
           </div>
         )}
