@@ -21,16 +21,16 @@ import Person from "@material-ui/icons/Person";
 
 const dashboardRoutes = [
   {
-    path: "/dashboard",
-    name: "Dashboard",
+    path: "/dashboard-ENS",
+    name: "Dashboard ENS",
     rtlName: "لوحة القيادة",
     icon: Dashboard,
 
     layout: "/admin",
   },
   {
-    path: "/dashboard-ENS",
-    name: "Dashboard ENS",
+    path: "/dashboard-Hash",
+    name: "Dashboard Hash",
     rtlName: "لوحة القيادة",
     icon: Person,
 
