@@ -154,7 +154,7 @@ export default function Admin({ children, ...rest }) {
       <div className={classes.mainPanel} ref={mainPanel}>
         {!walletConnected ? (
           <div>
-            <button handleClick={connectWallet}>"Connect Wallet"</button>
+            <button onClick={connectWallet}>"Connect Wallet"</button>
           </div>
         ) : (
           <div>
