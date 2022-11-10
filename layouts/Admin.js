@@ -39,11 +39,8 @@ export default function Admin({ children, ...rest }) {
 
   const connectWallet = async () => {
     const provider = await web3Modal.connect();
-    console.log(provider);
     const web3Provider = new ethers.providers.Web3Provider(provider);
-    console.log(web3Provider);
     const signer = web3Provider.getSigner();
-    console.log(signer);
     const address = await signer.getAddress();
     const checkForEns = await lookupEnsAddress(address);
     checkForEns !== null ? setAccount(checkForEns) : setAccount(address);
@@ -54,7 +51,6 @@ export default function Admin({ children, ...rest }) {
     if (network.chainId !== 5) {
       setNetworkError(true);
     }
-    console.log(network);
   };
 
   // // UseEffects
