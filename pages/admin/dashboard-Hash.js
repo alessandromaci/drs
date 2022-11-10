@@ -62,17 +62,17 @@ function Dashboard() {
     let account = getProfile();
     const rateHashInstance = new web3.eth.Contract(RateHash.abi, hashAddress);
 
-    const registerDomainTransactionParams = {
-      from: account,
-      to: hashAddress,
-      data: rateHashInstance.methods.registerNew(account).encodeABI(),
-    };
-
     try {
+      const registerDomainTransactionParams = {
+        from: account,
+        to: hashAddress,
+        data: rateHashInstance.methods.registerNew(account).encodeABI(),
+      };
       await web3.eth.sendTransaction(registerDomainTransactionParams);
       toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
+      toast.error("Failed to register a domain");
     }
   };
 
@@ -80,19 +80,19 @@ function Dashboard() {
     let account = getProfile();
     const rateHashInstance = new web3.eth.Contract(RateHash.abi, hashAddress);
 
-    const rateTransactionParams = {
-      from: account,
-      to: hashAddress,
-      data: rateHashInstance.methods
-        .rate(String(inputAddress), txHash, value)
-        .encodeABI(),
-    };
-
     try {
+      const rateTransactionParams = {
+        from: account,
+        to: hashAddress,
+        data: rateHashInstance.methods
+          .rate(String(inputAddress), txHash, value)
+          .encodeABI(),
+      };
       await web3.eth.sendTransaction(rateTransactionParams);
       toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
+      toast.error("Failed to rate a transaction hash");
     }
   };
 
@@ -107,6 +107,7 @@ function Dashboard() {
       console.log(rating.score);
     } catch (e) {
       console.error(e);
+      toast.error("Failed to retrieve rating!");
     }
   };
 

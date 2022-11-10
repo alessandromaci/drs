@@ -21,6 +21,7 @@ import logo from "assets/img/reactlogo.png";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import { setProfile } from "../variables/wallet";
+import { toast } from "react-toastify";
 
 let ps;
 
@@ -50,6 +51,7 @@ export default function Admin({ children, ...rest }) {
     const network = await web3Provider.getNetwork();
     if (network.chainId !== 5) {
       setNetworkError(true);
+      toast.error("You need to use Goerli chain");
     }
   };
 

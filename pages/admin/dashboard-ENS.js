@@ -59,17 +59,17 @@ function Dashboard() {
     let account = getProfile();
     const rateEnsInstance = new web3.eth.Contract(RateENS.abi, ensAddress);
 
-    const registerDomainTransactionParams = {
-      from: account,
-      to: ensAddress,
-      data: rateEnsInstance.methods.registerNew(account).encodeABI(),
-    };
-
     try {
+      const registerDomainTransactionParams = {
+        from: account,
+        to: ensAddress,
+        data: rateEnsInstance.methods.registerNew(account).encodeABI(),
+      };
       await web3.eth.sendTransaction(registerDomainTransactionParams);
       toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
+      toast.error("Failed to register a domain");
     }
   };
 
@@ -77,19 +77,20 @@ function Dashboard() {
     let account = getProfile();
     const rateEnsInstance = new web3.eth.Contract(RateENS.abi, ensAddress);
 
-    const rateTransactionParams = {
-      from: account,
-      to: ensAddress,
-      data: rateEnsInstance.methods
-        .rate(String(inputAddress), value)
-        .encodeABI(),
-    };
-
     try {
+      const rateTransactionParams = {
+        from: account,
+        to: ensAddress,
+        data: rateEnsInstance.methods
+          .rate(String(inputAddress), value)
+          .encodeABI(),
+      };
+
       await web3.eth.sendTransaction(rateTransactionParams);
       toast.success("Request sent!");
     } catch (err) {
       console.log("err: ", err);
+      toast.error("Failed to rate an ENS address");
     }
   };
 
@@ -104,6 +105,7 @@ function Dashboard() {
       console.log(rating.score);
     } catch (e) {
       console.error(e);
+      toast.error("Failed to retrieve rating!");
     }
   };
 
